@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Hex and Binary</title>
+
+	<script>
+		// allocate a 64K block of memory
+		const memory = new WebAssembly.Memory({ initial: 1 });
+		var output = null;
+		// function will change when WebAssembly module is instantiated
+		var setOutput = (number) => {
+			// this message will appear if you run the function
+			// before the WebAssembly module is instantiated.
+			console.log("function not available");
+			return 0;
+		};
+		// This function will be called from a button click and runs
+		// the setOutput function in the WebAssembly module.
+		function setNumbers(number) {
+			if (output == null) {
+				// if page has not fully loaded return
+				return;
+			}
+			// calling WebAssembly setOutput function generates the HTML
+			// string and puts it in linear memory returning its length
+			let len = setOutput(number);
+			// we know the position and length of the HTML string in
+			// linear memory so we can take it out of the memory buffer
+			let bytes = new Uint8Array(memory.buffer, 1024, len);
+			// convert the bytes taken from linear memory into a
+			// JavaScript string and use it to set the HTML in output
+			output.innerHTML = new TextDecoder('utf8').decode(bytes);
+		}
+		function onPageLoad() {
+			// when the page load is complete, set the output variable
+			// to the element with an id of "output"
+			output = document.getElementById("output");
+			var message_num = 0;
+		}
+		let importObject = {
+			env: {
+
+				buffer: memory
+			}
+		};
+		(async () => {
+			// use WebAssembly.instantiateStreaming in combination with
+			// fetch instead of WebAssembly.instantiate and fs.readFileSync
+			let obj = await WebAssembly.instantiateStreaming(
+				fetch('hex_and_binary.wasm'),
+				importObject);
+			// reset the setOutput variable to the setOutput
+			// function from the WASM module
+			setOutput = obj.instance.exports.setOutput;
+			let btn = document.getElementById("set_numbers_button");
+			btn.style.display = "block";
+		})();
+	</script>
+</head>
+
+<!-- body tag calls onPageLoad when the body load is complete -->
+
+<body onload="onPageLoad()" style="font-family: 'Courier New', Courier, monospace;">
+	<div id="output">
+		<!-- displays output from WebAssembly -->
+		<h1>0</h1>
+		<h4>0x0</h4>
+		<h4> 0000 0000 0000 0000 0000 0000 0000 0000</h4>
+	</div>
+	<br>
+	<!-- user enters input to convert to hex and binary here -->
+	<input type="number" id="val" value="0"><br><br>
+	<!-- when user clicks this button, the WASM function is run -->
+	<button id="set_numbers_button" type="button" style="display:none"
+		onclick="setNumbers( document.getElementById('val').value )">
+		Set Numbers
+	</button>
+</body>
+
+</html>

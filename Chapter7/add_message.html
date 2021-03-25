@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Add Message</title>
+
+	<script>
+		//const sleep = m => new Promise(r => setTimeout(r, m));
+		var output = null;
+		var add_message_function;
+		var log_add_message = (a, b, sum) => {
+			if (output == null) {
+				console.log("page load not complete: log_add_message");
+				return;
+			}
+			output.innerHTML += `${a} + ${b} = ${sum}<br>`;
+		};
+		let importObject = {
+			env: {
+				log_add_message: log_add_message,
+			}
+		};
+		(async () => {
+			// await sleep(5000);
+			let obj = await
+				WebAssembly.instantiateStreaming(fetch('add_message.wasm'),
+					importObject);
+			add_message_function = obj.instance.exports.add_message;
+			let btn = document.getElementById("add_message_button");
+			btn.style.display = "block";
+		})();
+		function onPageLoad() {
+			//(async () => {
+			//await sleep(5000);
+			output = document.getElementById("output");
+			//})();
+		}
+	</script>
+
+</head>
+
+<body onload="onPageLoad()" style="font-family: 'Courier New', Courier, monospace;">
+	<input type="number" id="a_val" value="0"><br><br>
+	<input type="number" id="b_val" value="0"><br><br>
+	<button id="add_message_button" type="button" style="display:none" onclick="add_message_function( 
+document.getElementById('a_val').value,
+document.getElementById('b_val').value )">
+		Add Values
+	</button>
+	<br>
+	<p id="output" style="float:left; width:200px; min-height:300px;">
+	</p>
+</body>
+
+</html>
