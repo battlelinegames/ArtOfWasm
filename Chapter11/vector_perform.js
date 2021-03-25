@@ -2,14 +2,14 @@ const fs = require('fs');
 
 const loader = require("@assemblyscript/loader");
 (async () => {
-	let importObject = { // ADD THIS LINE
-		env: { // ADD THIS LINE
-			abort: () => { } // ADD THIS LINE
-		}  // ADD THIS LINE
-	};  // ADD THIS LINE
+	let importObject = {
+		env: {
+			abort: () => { }
+		}
+	};
 	let wasm = fs.readFileSync('vector_loader.wasm');
 	let module = await loader.instantiate(wasm);
-	let obj = await WebAssembly.instantiate(wasm, importObject); // CHANGED THIS LINE
+	let obj = await WebAssembly.instantiate(wasm, importObject);
 	// This JavaScript class will have all the functions
 	// exported from AssemblyScript
 	let dVector2D = {
