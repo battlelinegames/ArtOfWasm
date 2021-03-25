@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+	<h1>Stack Trace</h1>
+	<script>
+		let importObject = {
+			js: {
+				log_stack_trace: function (level) {
+					console.trace(`level=${level}`);
+				}
+			}
+		};
+		(async () => {
+			let obj =
+				await WebAssembly.instantiateStreaming(fetch('stack_trace.wasm'),
+					importObject);
+			obj.instance.exports.call_stack_trace();
+		})();
+	</script>
+</body>
+
+</html>

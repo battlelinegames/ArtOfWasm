@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+	X1: <input type="number" id="x1" value="0">
+	Y1: <input type="number" id="y1" value="0">
+	X2: <input type="number" id="x2" value="4">
+	Y2: <input type="number" id="y2" value="3">
+	<br><br>
+	DISTANCE: <span id="dist_out">??</span>
+	<script>
+		var distance = null;
+		let importObject = {
+			js: {
+				log_f64: function (message_index, value) {
+					switch (message_index) {
+						case 1:
+							alert(`$x_dist=${value}`);
+							break;
+						case 2:
+							console.log(`$x_dist*$x_dist=${value}`);
+							break;
+						case 3:
+							console.log(`$y_dist=${value}`);
+							break;
+						case 4:
+							console.log(`$y_dist*$y_dist=${value}`);
+							break;
+						case 5:
+							console.log(`$y_dist*$y_dist + $x_dist*$x_dist=${value}`);
+							break;
+						case 6:
+							console.log(`dist=${value}`);
+							break;
+						default:
+							console.log(`message #${message_index} value=${value}`);
+					}
+				}
+			}
+		};
+		(async () => {
+			let obj = await WebAssembly.instantiateStreaming(
+				fetch('debugger.wasm'), importObject);
+			distance = obj.instance.exports.distance;
+		})();
+		function set_distance() {
+			let dist_out = document.getElementById('dist_out');
+			let x1 = document.getElementById('x1');
+			let x2 = document.getElementById('x2');
+			let y1 = document.getElementById('y1');
+			let y2 = document.getElementById('y2');
+			let dist = distance(x1.value, y1.value, x2.value, y2.value);
+			dist_out.innerHTML = dist;
+		}
+	</script>
+	<br>
+	<br>
+	<button onmousedown="set_distance()">Find Distance</button>
+</body>
+
+</html>
