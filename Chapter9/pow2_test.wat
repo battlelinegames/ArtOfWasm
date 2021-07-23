@@ -26,6 +26,20 @@
  i32.mul
  i32.add
  )
+ 
+ ;; replace mul with shift
+ (func (export "pow2_mul_shift")
+ (param $p1 i32)
+ (param $p2 i32)
+ (result i32)
+ local.get $p1
+ i32.const 16
+ i32.shl
+ local.get $p2
+ i32.const 8
+ i32.div_u
+ i32.add
+ )
 
   ;; change multiply and divide to shifts
  (func (export "pow2_mul_div_shift")
